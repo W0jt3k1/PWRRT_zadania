@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -5,7 +6,6 @@
 #include <map>
 #include <algorithm>
 #include <iomanip>
-
 using namespace std;
 
 struct Cone {
@@ -29,10 +29,7 @@ int find(int x, vector<int>& parent) {
 void unite(int a, int b, vector<int>& parent) {
     int rootA = find(a, parent);
     int rootB = find(b, parent);
-
-    if (rootA != rootB) {
-        parent[rootB] = rootA;
-    }
+    if (rootA != rootB) parent[rootB] = rootA;
 }
 
 int main() {
@@ -41,21 +38,29 @@ int main() {
         cerr << "Nie mozna otworzyc pliku!\n";
         return 1;
     }
-    cout << fixed << setprecision(3);
+
     int n;
     double m;
-
-    file >> n >> m;
-
-    vector<Cone> cones;
-    for(int i =0; i<n; i++){
-        Cone cone;
-        file >> cone.id >> cone.x >> cone.y;
-        cones.push_back(cone);
+    if (!(file >> n >> m) || n < 0 || m < 0) {
+        cerr << "Niepoprawne dane!\n";
+        return 1;
     }
 
-    vector<int> parent(n);
+    vector<Cone> cones;
+    int nextId = 0;
 
+    for (int i = 0; i < n; i++) {
+        Cone cone;
+        if (!(file >> cone.id >> cone.x >> cone.y)) {
+            cerr << "Niepoprawne dane pachołka!\n";
+            return 1;
+        }
+        cones.push_back(cone);
+        nextId = max(nextId, cone.id);
+    }
+    nextId++;
+
+    vector<int> parent(n);
     for (int i = 0; i < n; i++) {
         parent[i] = i;
     }
@@ -67,48 +72,57 @@ int main() {
             }
         }
     }
-    map<int, vector<int>> groups;
 
+    map<int, vector<int>> groups;
     for (int i = 0; i < n; i++) {
         groups[find(i, parent)].push_back(i);
-    } 
-    int nextId = 0;
-
-for (const Cone& cone : cones) {
-    nextId = max(nextId, cone.id);
-}
-nextId++;
-
-vector<Cone> newCones;
-
-for (const auto& [root, indices] : groups) {
-    if (indices.size() == 1) {
-        newCones.push_back(cones[indices[0]]);
-        continue;
     }
 
-    double sumX = 0, sumY = 0;
+    vector<Cone> newCones;
+    cout << fixed << setprecision(3);
 
-    for (int i : indices) {
-        sumX += cones[i].x;
-        sumY += cones[i].y;
+    for (const auto& [root, indices] : groups) {
+        if (indices.size() == 1) {
+            newCones.push_back(cones[indices[0]]);
+            continue;
+        }
+
+        double sumX = 0, sumY = 0;
+
+        for (int i : indices) {
+            sumX += cones[i].x;
+            sumY += cones[i].y;
+        }
+
+        Cone merged;
+        merged.id = nextId++;
+        merged.x = sumX / indices.size();
+        merged.y = sumY / indices.size();
+
+        newCones.push_back(merged);
+
+        cout << "CONE " << merged.id << " " << merged.x << " " << merged.y << " [";
+
+        for (int i = 0; i < (int)indices.size(); i++) {
+            if (i > 0) cout << ",";
+            cout << cones[indices[i]].id;
+        }
+        cout << "]\n";
     }
 
-    Cone merged;
-    merged.id = nextId++;
-    merged.x = sumX / indices.size();
-    merged.y = sumY / indices.size();
-
-    newCones.push_back(merged);
-
-    cout << "CONE " << merged.id << " "<< merged.x << " " << merged.y << " [";
-
-    for (int i = 0; i < indices.size(); i++) {
-        if (i > 0) cout << ",";
-        cout << cones[indices[i]].id;
+    ofstream output("deduplicated.txt");
+    if (!output.is_open()) {
+        cerr << "Nie mozna utworzyc pliku!\n";
+        return 1;
     }
 
-    cout << "]\n";
-}
+    output << newCones.size() << "\n";
+    output << m << "\n";
+    output << fixed << setprecision(3);
+
+    for (const Cone& cone : newCones) {
+        output << cone.id << " " << cone.x << " " << cone.y << "\n";
+    }
+
     return 0;
 }
