@@ -65,7 +65,7 @@ double perimeter(const vector<Cone>& hull) {
 }
 
 int main() {
-    ifstream file("example_input.txt");
+    ifstream file("deduplicated.txt");
     if (!file.is_open()) {
         cerr << "Nie mozna otworzyc pliku!\n";
         return 1;
