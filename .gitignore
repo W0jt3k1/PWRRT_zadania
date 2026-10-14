@@ -1,1 +1,25 @@
+# C++ - compiled files
 *.exe
+*.o
+*.out
+*.obj
+*.dll
+*.a
+*.so
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# uv
+.venv/
+.python-version
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
