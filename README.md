@@ -10,8 +10,6 @@ The project covers geometric algorithms implemented in C++ and sensor data analy
 - **Convex hull:** Computing the convex hull of deduplicated points using Andrew's monotone chain algorithm.
 - **Visualization:** Displaying input points, deduplicated points, and the resulting convex hull.
 
-The convex hull algorithm has O(n log n) time complexity due to sorting.
-
 ## Task 2 – Sensor Data Analysis
 
 - Processing and analyzing sensor measurements.
